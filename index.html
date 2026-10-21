@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f8f7f4" />
+  <title>Fieldnotes — Stories for curious minds</title>
+  <style>
+    :root {
+      --bg: #f8f7f4;
+      --paper: #fffefa;
+      --ink: #20231f;
+      --muted: #73776e;
+      --line: #e7e5de;
+      --accent: #486b50;
+      --accent-light: #e7eee5;
+      --serif: Georgia, "Times New Roman", serif;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.6; }
+    button, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; text-decoration: none; }
+    .site-header { border-bottom: 1px solid var(--line); background: rgba(248,247,244,.92); }
+    .nav { max-width: 1120px; margin: auto; padding: 19px 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.045em; font-size: 1.3rem; }
+    .brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: white; font-family: var(--serif); font-size: 1.25rem; }
+    .nav-links { display: flex; align-items: center; gap: 24px; color: var(--muted); font-size: .92rem; }
+    .nav-links a:hover, .text-link:hover { color: var(--accent); }
+    .nav-cta { background: var(--ink); color: white !important; padding: 9px 15px; border-radius: 999px; }
+    main { max-width: 1120px; margin: auto; padding: 0 24px 72px; }
+    .hero { padding: 66px 0 45px; display: grid; grid-template-columns: 1.2fr .8fr; align-items: end; gap: 32px; }
+    .eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: .14em; font-weight: 800; font-size: .72rem; }
+    h1, h2, h3, p { margin-top: 0; }
+    .hero h1 { font: 500 clamp(2.8rem, 6vw, 5.2rem)/.99 var(--serif); letter-spacing: -.055em; margin: 14px 0 20px; max-width: 700px; }
+    .hero h1 em { color: var(--accent); font-weight: 400; }
+    .hero-copy { color: var(--muted); max-width: 420px; margin: 0 0 5px; font-size: 1.03rem; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .categories { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 8px 14px; color: var(--muted); cursor: pointer; font-size: .84rem; transition: .2s; }
+    .chip:hover, .chip.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .search { position: relative; width: min(260px, 100%); flex-shrink: 0; }
+    .search input { width: 100%; border: 1px solid var(--line); background: var(--paper); border-radius: 999px; padding: 10px 14px 10px 38px; outline: none; }
+    .search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+    .search span { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+    .section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 32px 0 18px; }
+    .section-heading h2 { font: 500 1.8rem var(--serif); margin: 0; letter-spacing: -.03em; }
+    .result-count { color: var(--muted); font-size: .85rem; }
+    .featured { display: grid; grid-template-columns: 1.05fr .95fr; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-bottom: 28px; cursor: pointer; transition: transform .2s, box-shadow .2s; }
+    .featured:hover, .post-card:hover { transform: translateY(-3px); box-shadow: 0 14px 38px #20231f0c; }
+    .art { min-height: 300px; position: relative; overflow: hidden; display: grid; place-items: center; isolation: isolate; }
+    .art::before, .art::after { content: ""; position: absolute; z-index: -1; }
+    .art-forest { background: linear-gradient(145deg, #d9e1d1, #8ca18a); }
+    .art-forest::before { width: 72%; height: 115%; left: 8%; bottom: -44%; border-radius: 50% 50% 0 0; background: #536e57; transform: rotate(-15deg); }
+    .art-forest::after { width: 45%; height: 90%; right: -5%; bottom: -35%; border-radius: 50% 50% 0 0; background: #2f4c3a; transform: rotate(20deg); }
+    .art-sun { background: linear-gradient(140deg, #f4d9b2, #d88b62); }
+    .art-sun::before { width: 150px; height: 150px; border-radius: 50%; background: #f8edca; top: 18%; left: 28%; box-shadow: 0 0 0 22px #f8edca33; }
+    .art-sun::after { height: 40%; width: 130%; bottom: -10%; left: -10%; background: #a65f48; border-radius: 50% 50% 0 0; transform: rotate(-8deg); }
+    .art-blue { background: linear-gradient(135deg, #d5e0e3, #8caeb4); }
+    .art-blue::before { width: 75%; height: 70%; border: 2px solid #f8f7f4a8; border-radius: 50%; transform: rotate(-25deg); }
+    .art-blue::after { width: 50%; height: 90%; background: #477782; border-radius: 50% 50% 0 0; bottom: -50%; transform: rotate(25deg); }
+    .art-pink { background: linear-gradient(135deg, #f0d9d0, #d79f91); }
+    .art-pink::before { width: 40%; height: 75%; background: #f7eee5; border-radius: 50% 50% 10% 10%; transform: rotate(20deg); bottom: -12%; left: 20%; }
+    .art-pink::after { width: 35%; height: 60%; background: #a9665a; border-radius: 50% 50% 0 0; bottom: -10%; right: 15%; }
+    .art-label { position: absolute; top: 18px; left: 18px; background: #fffefaDD; padding: 6px 10px; border-radius: 999px; font-size: .72rem; font-weight: 700; color: #38463a; }
+    .featured-content { padding: clamp(24px, 4vw, 48px); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+    .meta { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; color: var(--muted); font-size: .78rem; }
+    .meta .dot { width: 3px; height: 3px; background: #aaa; border-radius: 50%; }
+    .category-label { color: var(--accent); text-transform: uppercase; font-size: .7rem; font-weight: 800; letter-spacing: .12em; margin-bottom: 13px; }
+    .featured h2 { font: 500 clamp(1.8rem, 3.3vw, 2.8rem)/1.1 var(--serif); letter-spacing: -.045em; margin: 13px 0; }
+    .featured p { color: var(--muted); margin-bottom: 22px; }
+    .byline { display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 18px; }
+    .avatar { display: grid; place-items: center; width: 34px; height: 34px; background: var(--accent-light); color: var(--accent); border-radius: 50%; font-size: .76rem; font-weight: 800; }
+    .byline-name { font-size: .82rem; font-weight: 700; }
+    .byline-role { color: var(--muted); font-size: .74rem; }
+    .text-link { color: var(--accent); font-weight: 750; font-size: .88rem; }
+    .post-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+    .post-card { background: var(--paper); border: 1px solid var(--line); border-radius: 15px; overflow: hidden; cursor: pointer; transition: transform .2s, box-shadow .2s; display: flex; flex-direction: column; }
+    .post-card .art { min-height: 190px; }
+    .post-card-content { padding: 20px; display: flex; flex-direction: column; align-items: flex-start; flex: 1; }
+    .post-card h3 { font: 500 1.45rem/1.16 var(--serif); letter-spacing: -.03em; margin: 8px 0 10px; }
+    .post-card p { color: var(--muted); font-size: .9rem; margin-bottom: 18px; }
+    .post-card .meta { margin-top: auto; }
+    .empty { display: none; padding: 48px 20px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: var(--radius); }
+    .newsletter { margin-top: 76px; padding: 42px; border-radius: var(--radius); background: #e9eee5; display: flex; align-items: center; justify-content: space-between; gap: 28px; }
+    .newsletter h2 { font: 500 clamp(1.6rem, 3vw, 2.25rem)/1.12 var(--serif); letter-spacing: -.04em; margin: 8px 0; }
+    .newsletter p { margin: 0; color: #626b5f; }
+    .newsletter-form { display: flex; gap: 8px; width: min(420px, 100%); }
+    .newsletter-form input { min-width: 0; flex: 1; border: 1px solid #d4ddcf; border-radius: 999px; padding: 12px 16px; background: #fffefa; outline: none; }
+    .newsletter-form button, .back-button { border: 0; background: var(--accent); color: white; border-radius: 999px; padding: 12px 18px; cursor: pointer; font-weight: 700; }
+    .site-footer { border-top: 1px solid var(--line); }
+    .footer-inner { max-width: 1120px; padding: 24px; margin: auto; display: flex; justify-content: space-between; gap: 16px; color: var(--muted); font-size: .82rem; }
+    /* Detail page */
+    #detail-page { display: none; }
+    .detail-top { padding: 30px 0 18px; }
+    .back-button { background: transparent; color: var(--accent); padding: 8px 0; }
+    .article { max-width: 760px; margin: 10px auto 80px; }
+    .article-header { text-align: center; padding: 26px 0 30px; }
+    .article-header h1 { font: 500 clamp(2.5rem, 6vw, 4.6rem)/1.02 var(--serif); letter-spacing: -.055em; margin: 15px 0 20px; }
+    .article-deck { color: var(--muted); font-size: 1.12rem; max-width: 620px; margin: 0 auto 22px; }
+    .article-byline { justify-content: center; }
+    .article-cover { min-height: 370px; border-radius: var(--radius); overflow: hidden; margin-bottom: 38px; }
+    .article-body { font: 1.1rem/1.9 var(--serif); color: #383c35; }
+    .article-body p { margin: 0 0 1.4em; }
+    .article-body h2 { font: 500 2rem/1.2 var(--serif); letter-spacing: -.03em; margin: 1.7em 0 .55em; color: var(--ink); }
+    .article-body blockquote { margin: 1.8em 0; padding: 5px 0 5px 22px; border-left: 3px solid var(--accent); color: var(--accent); font-size: 1.35rem; font-style: italic; }
+    .article-body .article-note { font: .9rem/1.7 var(--sans); background: #eeeee7; padding: 18px 20px; border-radius: 12px; }
+    .article-end { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    .article-end strong { display: block; }
+    .article-end span { color: var(--muted); font-size: .85rem; }
+    .toast { position: fixed; bottom: 22px; left: 50%; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: var(--ink); color: white; padding: 12px 18px; border-radius: 999px; box-shadow: 0 8px 24px #0002; transition: .25s; z-index: 10; font-size: .9rem; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    @media (max-width: 760px) {
+      .nav { padding: 15px 18px; }
+      .nav-links { gap: 14px; }
+      .nav-links .optional { display: none; }
+      main { padding: 0 18px 52px; }
+      .hero { padding: 48px 0 32px; grid-template-columns: 1fr; gap: 8px; }
+      .toolbar { align-items: stretch; flex-direction: column; }
+      .search { width: 100%; }
+      .featured { grid-template-columns: 1fr; }
+      .featured .art { min-height: 250px; }
+      .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+      .post-card .art { min-height: 155px; }
+      .post-card-content { padding: 15px; }
+      .newsletter { padding: 28px 22px; flex-direction: column; align-items: stretch; }
+      .article-cover { min-height: 260px; }
+    }
+    @media (max-width: 480px) {
+      .brand { font-size: 1.12rem; }
+      .nav-links { font-size: .84rem; gap: 12px; }
+      .hero h1 { font-size: 3.1rem; }
+      .post-grid { grid-template-columns: 1fr; }
+      .post-card { display: grid; grid-template-columns: 115px 1fr; min-height: 150px; }
+      .post-card .art { min-height: 100%; }
+      .post-card .art-label { top: 8px; left: 8px; font-size: .62rem; padding: 4px 7px; }
+      .post-card-content { padding: 14px; }
+      .post-card h3 { font-size: 1.22rem; }
+      .post-card p { font-size: .82rem; margin-bottom: 10px; }
+      .post-card .meta { font-size: .7rem; }
+      .newsletter-form { flex-direction: column; }
+      .newsletter-form button { padding: 12px; }
+      .footer-inner { padding: 22px 18px; flex-direction: column; }
+      .article-header h1 { font-size: 2.7rem; }
+      .article-body { font-size: 1.03rem; }
+      .article-end { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav" aria-label="Main navigation">
+      <a href="#" class="brand" aria-label="Fieldnotes home" onclick="showListing(); return false;">
+        <span class="brand-mark">f.</span> fieldnotes
+      </a>
+      <div class="nav-links">
+        <a href="#" onclick="showListing(); return false;">Stories</a>
+        <a class="optional" href="#newsletter" onclick="showListing();">About</a>
+        <a class="nav-cta" href="#newsletter" onclick="showListing();">Get the weekly note ↗</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section id="listing-page">
+      <section class="hero">
+        <div>
+          <div class="eyebrow">A journal for curious minds</div>
+          <h1>Ideas worth<br>slowing <em>down for.</em></h1>
+        </div>
+        <p class="hero-copy">Thoughtful stories on creativity, technology, and the small things that make a life feel a little bigger. Made for your next quiet cup of coffee.</p>
+      </section>
+
+      <section class="toolbar" aria-label="Filter blog posts">
+        <div class="categories" id="categories">
+          <button class="chip active" data-category="All">All stories</button>
+          <button class="chip" data-category="Creativity">Creativity</button>
+          <button class="chip" data-category="Technology">Technology</button>
+          <button class="chip" data-category="Lifestyle">Lifestyle</button>
+          <button class="chip" data-category="Culture">Culture</button>
+        </div>
+        <label class="search"><span aria-hidden="true">⌕</span><input id="search-input" type="search" placeholder="Search stories..." aria-label="Search stories"></label>
+      </section>
+
+      <div class="section-heading">
+        <h2>Editor's pick</h2><span class="result-count">A little something to start with</span>
+      </div>
+      <article class="featured" id="featured-post" tabindex="0" role="link" aria-label="Read featured article">
+        <div class="art art-forest"><span class="art-label">Editor's pick</span></div>
+        <div class="featured-content">
+          <div class="category-label">Lifestyle · 8 min read</div>
+          <h2>The quiet art of paying attention</h2>
+          <p>In a world that rewards speed, the simple act of noticing might be one of our most radical habits.</p>
+          <div class="byline">
+            <div class="avatar">AM</div><div><div class="byline-name">Alex Morgan</div><div class="byline-role">Editor · Oct 12, 2026</div></div>
+            <span style="margin-left:auto" class="text-link">Read story ↗</span>
+          </div>
+        </div>
+      </article>
+
+      <div class="section-heading">
+        <h2>Latest stories</h2><span class="result-count" id="result-count">6 stories</span>
+      </div>
+      <div class="post-grid" id="post-grid"></div>
+      <div class="empty" id="empty-state"><strong>No stories found.</strong><br>Try another search or category.</div>
+
+      <section class="newsletter" id="newsletter">
+        <div><div class="eyebrow">A good note, once a week</div><h2>Make room for a little wonder.</h2><p>Our best stories, delivered every Sunday. No noise, ever.</p></div>
+        <form class="newsletter-form" id="newsletter-form"><input type="email" id="email-input" placeholder="Your email address" aria-label="Your email address" required><button type="submit">Subscribe ↗</button></form>
+      </section>
+    </section>
+
+    <section id="detail-page">
+      <div class="detail-top"><button class="back-button" onclick="showListing()">← Back to all stories</button></div>
+      <article class="article" id="article-content"></article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner"><a href="#" class="brand" onclick="showListing(); return false;"><span class="brand-mark">f.</span> fieldnotes</a><span>© 2026 Fieldnotes Journal. Made for the curious.</span><a href="#newsletter" onclick="showListing();">Stay in the loop ↗</a></div>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const posts = [
+      {
+        id: "quiet-attention", title: "The quiet art of paying attention", category: "Lifestyle", date: "Oct 12, 2026", read: 8,
+        author: "Alex Morgan", initials: "AM", role: "Editor",
+        excerpt: "In a world that rewards speed, the simple act of noticing might be one of our most radical habits.",
+        art: "art-forest", featured: true,
+        body: `<p>Somewhere along the way, we started treating attention like a resource to spend rather than a way to experience the world. We split it into tiny pieces, trade it for notifications, and wonder why the days seem to pass without leaving much behind.</p>
+        <p>But attention is more than focus. It is the beginning of appreciation. The first step toward understanding another person, a place, or even ourselves is to stay with it long enough to see what is really there.</p>
+        <h2>Practice noticing the ordinary</h2>
+        <p>Try walking a familiar route without headphones. Notice the way light lands on a wall, the small garden someone has cared for, or the sound of a shop opening for the day. Nothing extraordinary needs to happen. The point is to be present for what already does.</p>
+        <blockquote>Attention is the most basic form of generosity: giving something your time without asking it to entertain you.</blockquote>
+        <p>This kind of noticing is not a productivity trick. It won't necessarily help you do more in a day. It might help you feel more of the day you already have.</p>
+        <h2>Make a little room</h2>
+        <p>You don't need a new routine or a perfect morning. Start with one ordinary moment: the first sip of coffee, the walk to the bus, the few minutes before a meeting. Let it be just that moment, not a gap to fill.</p>
+        <p>Over time, the world can feel less like a stream of things to get through and more like a place you actually live. That is a quiet change, but not a small one.</p>
+        <p class="article-note"><strong>A small experiment:</strong> For the next week, write down one thing you noticed each day that you would usually have missed. Keep it simple. Let curiosity do the rest.</p>`
+      },
+      {
+        id: "creative-routines", title: "A gentler way to build a creative habit", category: "Creativity", date: "Oct 10, 2026", read: 5,
+        author: "Maya Chen", initials: "MC", role: "Writer",
+        excerpt: "Forget waiting for inspiration. Build a small, forgiving practice that leaves the door open for good ideas.",
+        art: "art-sun",
+        body: `<p>We tend to imagine creativity as a lightning strike: sudden, brilliant, and impossible to plan. The reality is usually quieter. A notebook left open. Ten minutes before the day gets busy. A rough first draft that nobody else needs to see.</p>
+        <h2>Make the beginning smaller</h2><p>When a habit feels difficult, lower the cost of starting. Write one sentence, sketch one shape, or collect one interesting reference. You are not trying to make something remarkable every day. You are keeping the conversation going.</p>
+        <blockquote>Consistency is easier when the practice is allowed to be imperfect.</blockquote>
+        <p>Give yourself a clear starting cue and a modest finish line. Stop while you still have a little energy left, so returning tomorrow feels inviting instead of exhausting.</p>
+        <h2>Protect the playful part</h2><p>Not every experiment needs to become a project. Some ideas are useful because they teach you what you don't want to make. Keep a space where curiosity matters more than the result, and your creative work will have more room to surprise you.</p>`
+      },
+      {
+        id: "human-tech", title: "Making technology feel a little more human", category: "Technology", date: "Oct 08, 2026", read: 6,
+        author: "Noah Patel", initials: "NP", role: "Product designer",
+        excerpt: "The best digital tools don't demand our attention. They help us spend it on what matters.",
+        art: "art-blue",
+        body: `<p>Good technology can feel almost invisible. It helps you get somewhere, understand something, or stay close to someone, then quietly gets out of the way. The experience feels simple because someone has taken the time to make it so.</p>
+        <h2>Useful beats impressive</h2><p>It's easy to confuse novelty with value. A feature can be clever and still make a task harder. Human-centered design begins with a different question: what is this person trying to do, and how can we make that easier?</p>
+        <p>That means clear language, sensible defaults, accessible controls, and the ability to recover when something goes wrong. It also means knowing when not to add another notification.</p>
+        <h2>Design for the whole day</h2><p>People use products while tired, distracted, rushed, or learning something new. Respecting those moments is not a bonus. It is the work. Technology feels more human when it meets people where they are rather than asking them to adapt to every system.</p>`
+      },
+      {
+        id: "slow-mornings", title: "The case for a slower morning", category: "Lifestyle", date: "Oct 05, 2026", read: 4,
+        author: "Iris James", initials: "IJ", role: "Contributor",
+        excerpt: "A few unhurried minutes can change the texture of a day. Here's how to make space for them.",
+        art: "art-pink",
+        body: `<p>There is a particular feeling to a morning that begins before the rush: the kettle warming, a window cracked open, the day still full of possibility. You don't need a two-hour routine to find it. You only need a little breathing room.</p>
+        <h2>Choose one anchor</h2><p>Instead of building an elaborate checklist, choose one small thing you enjoy. Stretch by the window. Read a page. Eat breakfast sitting down. Let that be enough to begin with.</p>
+        <p>Prepare what you can the night before, and resist the urge to measure the morning by how much you accomplish. The goal isn't to win the day before 8 a.m. It's to arrive in it.</p>
+        <h2>Leave space for real life</h2><p>Some mornings will be chaotic. A slower morning is not a rule you have failed when the alarm doesn't go off. It is an invitation you can return to whenever there is room.</p>`
+      },
+      {
+        id: "city-walks", title: "What a city walk can teach you", category: "Culture", date: "Oct 02, 2026", read: 7,
+        author: "Sam Rivera", initials: "SR", role: "Photographer",
+        excerpt: "Take the long way home and discover the stories hidden in the streets you thought you knew.",
+        art: "art-sun",
+        body: `<p>A city reveals itself slowly. The main roads tell one story; the side streets tell another. Walk without a destination and you begin to notice the details that a commute edits out: handwritten signs, old doorways, the smell of bread drifting from a back lane.</p>
+        <h2>Look beyond the landmarks</h2><p>Every neighborhood has its own rhythm. Watch where people pause, what gets repaired, which benches are well used. These everyday details say as much about a place as its famous buildings.</p>
+        <p>Walking is a way to be a visitor in your own city. It asks very little of you, and returns a different kind of knowledge: not facts to memorize, but a sense of how a place feels.</p>`
+      },
+      {
+        id: "digital-garden", title: "Curate your own little corner of the internet", category: "Technology", date: "Sep 28, 2026", read: 5,
+        author: "Maya Chen", initials: "MC", role: "Writer",
+        excerpt: "A healthier online life starts with choosing what you invite in, not just what you block out.",
+        art: "art-blue",
+        body: `<p>Your online world is a place you spend time in. Like any place, it can become cluttered, loud, and full of things you never meant to keep. The good news is that you can shape it.</p>
+        <h2>Follow your curiosity</h2><p>Keep the newsletters that teach you something. Follow people whose work makes you think. Save articles you genuinely want to read, and give yourself permission to unfollow accounts that leave you feeling worse.</p>
+        <p>You don't need to optimize every minute or turn your feed into a self-improvement project. Make it a place with a little more wonder, usefulness, and delight.</p>`
+      }
+    ];
+
+    const listingPage = document.getElementById("listing-page");
+    const detailPage = document.getElementById("detail-page");
+    const postGrid = document.getElementById("post-grid");
+    const searchInput = document.getElementById("search-input");
+    const resultCount = document.getElementById("result-count");
+    const emptyState = document.getElementById("empty-state");
+    let activeCategory = "All";
+
+    function postCard(post) {
+      return `<article class="post-card" tabindex="0" role="link" aria-label="Read ${post.title}" data-post="${post.id}" onclick="showPost('${post.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showPost('${post.id}')}">
+        <div class="art ${post.art}"><span class="art-label">${post.category}</span></div>
+        <div class="post-card-content">
+          <div class="meta">${post.date}<span class="dot"></span>${post.read} min read</div>
+          <h3>${post.title}</h3><p>${post.excerpt}</p>
+          <span class="text-link">Read story ↗</span>
+        </div>
+      </article>`;
+    }
+
+    function renderPosts() {
+      const term = searchInput.value.trim().toLowerCase();
+      const filtered = posts.filter(post => !post.featured &&
+        (activeCategory === "All" || post.category === activeCategory) &&
+        `${post.title} ${post.excerpt} ${post.category} ${post.author}`.toLowerCase().includes(term));
+      postGrid.innerHTML = filtered.map(postCard).join("");
+      resultCount.textContent = `${filtered.length} ${filtered.length === 1 ? "story" : "stories"}`;
+      emptyState.style.display = filtered.length ? "none" : "block";
+      document.getElementById("featured-post").style.display =
+        (activeCategory === "All" || posts[0].category === activeCategory) &&
+        `${posts[0].title} ${posts[0].excerpt} ${posts[0].category}`.toLowerCase().includes(term) ? "grid" : "none";
+    }
+
+    document.getElementById("categories").addEventListener("click", event => {
+      const button = event.target.closest("[data-category]");
+      if (!button) return;
+      activeCategory = button.dataset.category;
+      document.querySelectorAll(".chip").forEach(chip => chip.classList.toggle("active", chip === button));
+      renderPosts();
+    });
+    searchInput.addEventListener("input", renderPosts);
+    document.getElementById("featured-post").addEventListener("click", () => showPost(posts[0].id));
+    document.getElementById("featured-post").addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") { event.preventDefault(); showPost(posts[0].id); }
+    });
+
+    function showPost(id) {
+      const post = posts.find(item => item.id === id);
+      if (!post) return showListing();
+      listingPage.style.display = "none";
+      detailPage.style.display = "block";
+      const article = document.getElementById("article-content");
+      article.innerHTML = `
+        <header class="article-header">
+          <div class="category-label">${post.category} · ${post.read} min read</div>
+          <h1>${post.title}</h1>
+          <p class="article-deck">${post.excerpt}</p>
+          <div class="byline article-byline"><div class="avatar">${post.initials}</div><div style="text-align:left"><div class="byline-name">${post.author}</div><div class="byline-role">${post.role} · ${post.date}</div></div></div>
+        </header>
+        <div class="article-cover art ${post.art}"><span class="art-label">${post.category}</span></div>
+        <div class="article-body">${post.body}</div>
+        <div class="article-end"><div><strong>Enjoyed this story?</strong><span>Share it with someone who might enjoy it too.</span></div><button class="back-button" onclick="shareStory('${post.id}')">Share story ↗</button></div>`;
+      history.pushState({ page: "post", id }, "", `#${id}`);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      document.title = `${post.title} — Fieldnotes`;
+    }
+
+    function showListing(updateHistory = true) {
+      detailPage.style.display = "none";
+      listingPage.style.display = "block";
+      if (updateHistory) history.pushState({ page: "listing" }, "", "#");
+      document.title = "Fieldnotes — Stories for curious minds";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function shareStory(id) {
+      const post = posts.find(item => item.id === id);
+      const url = `${location.href.split("#")[0]}#${id}`;
+      try {
+        if (navigator.share) await navigator.share({ title: post.title, text: post.excerpt, url });
+        else if (navigator.clipboard) { await navigator.clipboard.writeText(url); showToast("Story link copied to clipboard"); }
+        else showToast("Copy the page URL to share this story");
+      } catch (error) { if (error.name !== "AbortError") showToast("Couldn't share just now"); }
+    }
+
+    let toastTimer;
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message; toast.classList.add("show");
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove("show"), 2800);
+    }
+
+    document.getElementById("newsletter-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const email = document.getElementById("email-input").value.trim();
+      if (!email) return;
+      showToast("Thanks for your interest! Connect a mailing service to enable sign-ups.");
+      event.target.reset();
+    });
+
+    window.addEventListener("popstate", () => routeFromHash(false));
+    function routeFromHash(push = false) {
+      const id = location.hash.slice(1);
+      if (posts.some(post => post.id === id)) showPostWithoutPush(id);
+      else {
+        detailPage.style.display = "none"; listingPage.style.display = "block";
+        document.title = "Fieldnotes — Stories for curious minds";
+      }
+    }
+    function showPostWithoutPush(id) {
+      // Render the requested post without adding another history entry.
+      const post = posts.find(item => item.id === id);
+      if (!post) return;
+      listingPage.style.display = "none"; detailPage.style.display = "block";
+      const article = document.getElementById("article-content");
+      article.innerHTML = `<header class="article-header"><div class="category-label">${post.category} · ${post.read} min read</div><h1>${post.title}</h1><p class="article-deck">${post.excerpt}</p><div class="byline article-byline"><div class="avatar">${post.initials}</div><div style="text-align:left"><div class="byline-name">${post.author}</div><div class="byline-role">${post.role} · ${post.date}</div></div></div></header><div class="article-cover art ${post.art}"><span class="art-label">${post.category}</span></div><div class="article-body">${post.body}</div><div class="article-end"><div><strong>Enjoyed this story?</strong><span>Share it with someone who might enjoy it too.</span></div><button class="back-button" onclick="shareStory('${post.id}')">Share story ↗</button></div>`;
+      document.title = `${post.title} — Fieldnotes`;
+    }
+
+    renderPosts();
+    routeFromHash();
+  </script>
+</body>
+</html>
